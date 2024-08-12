@@ -1,5 +1,5 @@
 import unittest
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -18,8 +18,6 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode("p", "What a strange world",None, {"class": "primary"},)
         self.assertEqual(node.__repr__(), "HTMLNode(p, What a strange world, children: None, {'class': 'primary'})",)
 
-class TestLeafNode(unittest.TestCase):
-
     def test_leafnode_to_html(self):
         leaf = LeafNode(tag="p", value="This is a paragraph", props={"class": "text"})
         self.assertEqual(leaf.to_html(), '<p class="text">This is a paragraph</p>')
@@ -35,6 +33,32 @@ class TestLeafNode(unittest.TestCase):
     def test_leafnode_empty_value(self):
         leaf = LeafNode(tag="div", value="")
         self.assertEqual(leaf.to_html(), '<div></div>')
+
+    def test_parentnode_children(self):
+        with self.assertRaises(TypeError):
+            ParentNode(tag="div", value="Parent node", children = [])
+
+    def test_headings(self):
+        node = ParentNode("h2",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],)
+        self.assertEqual(node.to_html(), "<h2><b>Bold text</b>Normal text<i>italic text</i>Normal text</h2>",)
+
+    def test_to_html_many_children(self):
+        node = ParentNode("p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],)
+        self.assertEqual(node.to_html(), "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>",)
+
+
 
 if __name__ == "__main__":
     unittest.main()
